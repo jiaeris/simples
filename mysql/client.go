@@ -17,3 +17,45 @@ func Conn() {
 	}
 	fmt.Println(Db.Ping())
 }
+
+func Run() {
+	dbRoot := &DbRoot{
+		Name:"test",
+		Account:"root",
+		Password:"root",
+	}
+	dbRoot.Conn()
+}
+
+type DbRoot struct {
+	Name       string
+	Account    string
+	Password   string
+	ClientConn *sql.DB //数据库客户端
+	DbConn     *sql.DB //数据库连接实例
+}
+
+func (dbRoot *DbRoot) CreateDb() {
+
+}
+
+func (dbRoot *DbRoot) CreateTable() {
+
+}
+
+func (dbRoot *DbRoot) ShowTables() {
+	//dbRoot.DbConn.
+}
+
+func (dbRoot *DbRoot) Conn() {
+	var err error
+	dataSourceName := fmt.Sprintf("%s:%s@tcp(localhost:3306)/%s?charset=utf8&parseTime=true&loc=Local",
+		dbRoot.Account, dbRoot.Password, dbRoot.Name)
+	dbRoot.DbConn, err = sql.Open("mysql", dataSourceName)
+	if err != nil {
+		panic(err)
+	}
+	err = dbRoot.DbConn.Ping()
+	fmt.Println(err)
+}
+
