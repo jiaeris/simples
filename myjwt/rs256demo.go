@@ -4,9 +4,9 @@ import (
 	"jwt-go"
 	"fmt"
 	"crypto/rsa"
-	"math/rand"
-	"time"
+	//"time"
 	"encoding/json"
+	"crypto/rand"
 )
 
 var prk *rsa.PrivateKey
@@ -14,9 +14,9 @@ var puk *rsa.PublicKey
 
 func useSigningMethodRS256() {
 	//创建公私钥对象
-	r := rand.New(rand.NewSource(time.Now().Unix()))
+	//r := rand.New(rand.NewSource(time.Now().Unix()))
 	var err error
-	prk, err = rsa.GenerateKey(r, 1024)
+	prk, err = rsa.GenerateKey(rand.Reader, 1024)
 	if err != nil {
 		fmt.Println(err)
 	}
