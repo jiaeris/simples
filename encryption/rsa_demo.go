@@ -58,11 +58,23 @@ func EnDecryptDemo(data []byte) ([]byte) {
 	return cipherData
 }
 
+const (
+	rootPath       = "./pems"
+	pkcs1AesPriKey = rootPath + "/aes_private_key.pem"
+	pkcs1AesPubKey = rootPath + "/aes_public_key.pem"
+
+	pkcs8PriKey = rootPath + "/pkcs8_private_key.pem"
+	pkcs8PubKey = rootPath + "/pkcs8_public_key.pem"
+
+	pkcs1NoPassPriKey = rootPath + "/private_key_nopass.pem"
+	pkcs1NoPassPubKey = rootPath + "/public_key_nopass.pem"
+)
+
 func RSADriverDemo() {
 	rd := NewRSA()
-	err := rd.InitByByte(PKCS1WithPassPrivateBytes, PKCS1WithPassPublicBytes, []string{"1203"})
+	err := rd.InitByByte(PKCS1WithPassPrivateBytes, PKCS1WithPassPublicBytes, "1203")
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
 	cipherData, err := rd.Encrypt([]byte("hello world"))
 	if err != nil {
@@ -75,4 +87,13 @@ func RSADriverDemo() {
 	}
 	fmt.Println(string(plainData))
 
+	//use pem file
+	rd2 := NewRSA()
+	//rd2.InitByFile(pkcs1AesPriKey, pkcs1AesPubKey, "1203")
+	rd2.SetPKCSVersion(PKCS8)
+	rd2.InitByFile(pkcs8PriKey, pkcs8PubKey)
+	cipherData, err = rd2.Encrypt([]byte("hei hei hei "))
+	fmt.Println(cipherData)
+	plainData, err = rd2.Decrypt(cipherData)
+	fmt.Println(string(plainData))
 }

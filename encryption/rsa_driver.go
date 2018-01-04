@@ -20,7 +20,7 @@ const (
 
 type RSADriver interface {
 	InitByFile(priKeyPath, pubKeyPath string, pass ...string) error
-	InitByByte(priKeyBytes, pubKeyBytes []byte, pass []string) error
+	InitByByte(priKeyBytes, pubKeyBytes []byte, pass string) error
 	SetPKCSVersion(t Type)
 	Encrypt(plainData []byte) ([]byte, error)
 	Decrypt(cipherData []byte) ([]byte, error)
@@ -35,7 +35,6 @@ type RSA struct {
 
 //use this method to create driver object.
 func NewRSA() RSADriver {
-
 	rsa := &RSA{
 		Type:   PKCS1,
 		isInit: false,
@@ -65,15 +64,18 @@ func (r *RSA) InitByFile(priKeyPath, pubKeyPath string, pass ...string) error {
 	if err != nil {
 		return errors.New("read public key file error")
 	}
-	err = r.InitByByte(priKeyBytes, pubKeyBytes, pass)
+	if len(pass) > 0 {
+		err = r.InitByByte(priKeyBytes, pubKeyBytes, pass[0])
+	} else {
+		err = r.InitByByte(priKeyBytes, pubKeyBytes, "")
+	}
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
-func (r *RSA) InitByByte(priKeyBytes, pubKeyBytes []byte, pass []string) error {
+func (r *RSA) InitByByte(priKeyBytes, pubKeyBytes []byte, pass string) error {
 	//decode public key
 	pubBlock, _ := pem.Decode(pubKeyBytes)
 	if pubBlock == nil {
@@ -93,8 +95,7 @@ func (r *RSA) InitByByte(priKeyBytes, pubKeyBytes []byte, pass []string) error {
 	var priBlockBytes []byte
 	if len(pass) > 0 {
 		var err error
-		password := pass[0]
-		priBlockBytes, err = x509.DecryptPEMBlock(priBlock, []byte(password))
+		priBlockBytes, err = x509.DecryptPEMBlock(priBlock, []byte(pass))
 		if err != nil {
 			return errors.New("verify password error,please check your password")
 		}
@@ -119,7 +120,6 @@ func (r *RSA) InitByByte(priKeyBytes, pubKeyBytes []byte, pass []string) error {
 		return pppkerr
 	}
 	r.PriKey = priKey
-
 	r.isInit = true
 	return nil
 }
@@ -132,7 +132,6 @@ func (r *RSA) Encrypt(plainData []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return cipherData, nil
 }
 
