@@ -37,6 +37,7 @@ type SocketInterface interface {
 
 type Socket struct {
 	Conn *net.TCPConn
+
 }
 
 func (s *Socket) Write() {

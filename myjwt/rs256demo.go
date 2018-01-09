@@ -49,7 +49,6 @@ func rs256encode(token *jwt.Token) string {
 
 func rs256decode(tokenString string) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-
 		return puk, nil
 	})
 	if err != nil {
