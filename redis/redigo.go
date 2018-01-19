@@ -33,6 +33,14 @@ func conn() {
 	}
 	fmt.Println(r)
 	//redis.Map
+	c.Do("SET", "HiByte", []byte("helloCCC"))
+
+	buf, err := redis.Bytes(c.Do("GET", "HiByte"))
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(buf)
+	fmt.Println(string(buf))
 
 }
 
