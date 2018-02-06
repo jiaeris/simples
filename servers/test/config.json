@@ -1,0 +1,15 @@
+{
+  "db": {
+    "usr": "root",
+    "psw": "root",
+    "name": "doll",
+    "charset": "utf8",
+    "parseTime": true
+  },
+  "redis": {
+  },
+  "mq": {
+  },
+  "slog": {
+  }
+}

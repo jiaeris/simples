@@ -1,5 +1,7 @@
-.idea
+.idea/
 bin
 mongodb
 memercache
 vendor/
+
+*.exe
