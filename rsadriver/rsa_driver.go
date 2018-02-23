@@ -1,4 +1,4 @@
-package encryption
+package rsadriver
 
 import (
 	"os"
@@ -19,8 +19,8 @@ const (
 )
 
 type RSADriver interface {
-	InitByFile(priKeyPath, pubKeyPath string, pass ...string) error
-	InitByByte(priKeyBytes, pubKeyBytes []byte, pass string) error
+	InitByFile(priKeyPath, pubKeyPath string, pass ...string) *RSA
+	InitByByte(priKeyBytes, pubKeyBytes []byte, pass string) *RSA
 	SetPKCSVersion(t Type)
 	Encrypt(plainData []byte) ([]byte, error)
 	Decrypt(cipherData []byte) ([]byte, error)
@@ -47,58 +47,53 @@ func (r *RSA) SetPKCSVersion(t Type) {
 	r.Type = t
 }
 
-func (r *RSA) InitByFile(priKeyPath, pubKeyPath string, pass ...string) error {
+func (r *RSA) InitByFile(priKeyPath, pubKeyPath string, pass ...string) *RSA {
 	priKeyFile, err := os.Open(priKeyPath)
 	if err != nil {
-		return errors.New("open private key file error")
+		panic(errors.New("open private key file error"))
 	}
 	priKeyBytes, err := ioutil.ReadAll(priKeyFile)
 	if err != nil {
-		return errors.New("read private key file error")
+		panic(errors.New("read private key file error"))
 	}
-
 	pubKeyFile, err := os.Open(pubKeyPath)
 	if err != nil {
-		return errors.New("open public key file error")
+		panic(errors.New("open public key file error"))
 	}
 	pubKeyBytes, err := ioutil.ReadAll(pubKeyFile)
 	if err != nil {
-		return errors.New("read public key file error")
+		panic(errors.New("read public key file error"))
 	}
 	if len(pass) > 0 {
-		err = r.InitByByte(priKeyBytes, pubKeyBytes, pass[0])
+		return r.InitByByte(priKeyBytes, pubKeyBytes, pass[0])
 	} else {
-		err = r.InitByByte(priKeyBytes, pubKeyBytes, "")
+		return r.InitByByte(priKeyBytes, pubKeyBytes, "")
 	}
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
-func (r *RSA) InitByByte(priKeyBytes, pubKeyBytes []byte, pass string) error {
+func (r *RSA) InitByByte(priKeyBytes, pubKeyBytes []byte, pass string) *RSA {
 	//decode public key
 	pubBlock, _ := pem.Decode(pubKeyBytes)
 	if pubBlock == nil {
-		return errors.New("public key error")
+		panic(errors.New("public key error"))
 	}
 	pubKeyI, err := x509.ParsePKIXPublicKey(pubBlock.Bytes)
 	if err != nil {
-		return err
+		panic(err)
 	}
 	r.PubKey = pubKeyI.(*rsa.PublicKey)
 
 	//decode private key
 	priBlock, _ := pem.Decode(priKeyBytes)
 	if priBlock == nil {
-		return errors.New("private key error")
+		panic(errors.New("private key error"))
 	}
 	var priBlockBytes []byte
 	if len(pass) > 0 {
 		var err error
 		priBlockBytes, err = x509.DecryptPEMBlock(priBlock, []byte(pass))
 		if err != nil {
-			return errors.New("verify password error,please check your password")
+			panic(errors.New("verify password error,please check your password"))
 		}
 	} else {
 		priBlockBytes = priBlock.Bytes
@@ -115,14 +110,14 @@ func (r *RSA) InitByByte(priKeyBytes, pubKeyBytes []byte, pass string) error {
 		pppkerr = pppkerrI
 		break
 	default:
-		return errors.New("have no this type, types(pkcs1,pkcs8)")
+		panic(errors.New("have no this type, types(pkcs1,pkcs8)"))
 	}
 	if pppkerr != nil {
-		return pppkerr
+		panic(pppkerr)
 	}
 	r.PriKey = priKey
 	r.isInit = true
-	return nil
+	return r
 }
 
 func (r *RSA) Encrypt(plainData []byte) ([]byte, error) {

@@ -1,9 +1,9 @@
-package encryption
+package rsadriver
 
 import "testing"
 
 func TestEnDecryptDemo(t *testing.T) {
 	//words := "hello ! my name is yunga ."
 	//EnDecryptDemo([]byte(words))
-	RSADriverDemo()
+	//RSADriverDemo()
 }

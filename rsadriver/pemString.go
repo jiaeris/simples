@@ -1,4 +1,4 @@
-package encryption
+package rsadriver
 
 var PKCS1NoPassPrivateBytes = []byte(`-----BEGIN RSA PRIVATE KEY-----
 MIICXgIBAAKBgQCuNrKBiKXgACMd14h4Ep2HyBdIVTzRfeVOUMv4g/h9nLchyuAL
